@@ -35,7 +35,7 @@
 @synthesize callbackId, isRunning,x,y,z,timestamp;
 
 // defaults to 10 msec
-#define kAccelerometerInterval 10
+#define kAccelerometerInterval 5
 // g constant: -9.81 m/s^2
 #define kGravitationalConstant -9.81
 
@@ -70,14 +70,14 @@
         self.motionManager = [[CMMotionManager alloc] init];
     }
 
-    if ([self.motionManager isAccelerometerAvailable] == YES) {
+    if ([self.motionManager isMagnetometerAvailable] == YES) {
         // Assign the update interval to the motion manager and start updates
-        [self.motionManager setAccelerometerUpdateInterval:kAccelerometerInterval/1000];  // expected in seconds
+        [self.motionManager setMagnetometerUpdateInterval:kAccelerometerInterval/1000];  // expected in seconds
         __weak CDVAccelerometer* weakSelf = self;
-        [self.motionManager startAccelerometerUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
-            weakSelf.x = accelerometerData.acceleration.x;
-            weakSelf.y = accelerometerData.acceleration.y;
-            weakSelf.z = accelerometerData.acceleration.z;
+        [self.motionManager startMagnetometerUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMMagnetometerData * accelerometerData, NSError *error) {
+            weakSelf.x = accelerometerData.magneticField.x;
+            weakSelf.y = accelerometerData.magneticField.y;
+            weakSelf.z = accelerometerData.magneticField.z;
             weakSelf.timestamp = ([[NSDate date] timeIntervalSince1970] * 1000);
             [weakSelf returnAccelInfo];
         }];
@@ -118,9 +118,9 @@
     // Create an acceleration object
     NSMutableDictionary* accelProps = [NSMutableDictionary dictionaryWithCapacity:4];
 
-    [accelProps setValue:[NSNumber numberWithDouble:self.x * kGravitationalConstant] forKey:@"x"];
-    [accelProps setValue:[NSNumber numberWithDouble:self.y * kGravitationalConstant] forKey:@"y"];
-    [accelProps setValue:[NSNumber numberWithDouble:self.z * kGravitationalConstant] forKey:@"z"];
+    [accelProps setValue:[NSNumber numberWithDouble:self.x] forKey:@"x"];
+    [accelProps setValue:[NSNumber numberWithDouble:self.y] forKey:@"y"];
+    [accelProps setValue:[NSNumber numberWithDouble:self.z] forKey:@"z"];
     [accelProps setValue:[NSNumber numberWithDouble:self.timestamp] forKey:@"timestamp"];
 
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:accelProps];
