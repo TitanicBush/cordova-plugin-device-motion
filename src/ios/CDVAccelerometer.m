@@ -34,8 +34,8 @@
 
 @synthesize callbackId, isRunning,x,y,z,timestamp;
 
-// defaults to 10 msec
-#define kAccelerometerInterval 5
+// defaults to 20 msec
+#define kAccelerometerInterval 20
 // g constant: -9.81 m/s^2
 #define kGravitationalConstant -9.81
 
@@ -103,12 +103,12 @@
 
 - (void)stop:(CDVInvokedUrlCommand*)command
 {
-    if ([self.motionManager isAccelerometerAvailable] == YES) {
+    if ([self.motionManager isMagnetometerAvailable] == YES) {
         if (self.haveReturnedResult == NO){
             // block has not fired before stop was called, return whatever result we currently have
             [self returnAccelInfo];
         }
-        [self.motionManager stopAccelerometerUpdates];
+        [self.motionManager stopMagnetometerUpdates];
     }
     self.isRunning = NO;
 }
@@ -123,6 +123,7 @@
     [accelProps setValue:[NSNumber numberWithDouble:self.z] forKey:@"z"];
     [accelProps setValue:[NSNumber numberWithDouble:self.timestamp] forKey:@"timestamp"];
 
+    NSLog(@"%d %3.2f", kAccelerometerInterval, self.timestamp);
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:accelProps];
     [result setKeepCallback:[NSNumber numberWithBool:YES]];
     [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
